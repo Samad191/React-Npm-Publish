@@ -1,11 +1,61 @@
 import React, { useState } from 'react';
 import './index.css'
 
+import { WagmiConfig } from 'wagmi'
+import { goerli, mainnet } from 'viem/chains'
+import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react'
+import { useWeb3Modal } from '@web3modal/wagmi/react'
+import { useAccount } from 'wagmi';
+import { useWeb3ModalState } from '@web3modal/wagmi/react'
+
+
+function ConnectButton() {
+    // 4. Use modal hook
+    const { open } = useWeb3Modal()
+     const { address } = useAccount()
+    const { selectedNetworkId } = useWeb3ModalState()
+    console.log('account', address, selectedNetworkId)
+   
+  
+    return (
+      <>
+        <button onClick={() => {
+            open();
+            console.log('address click', address)
+        }}>Open Connect Modal</button>
+        <button onClick={() => open({ view: 'Networks' })}>Open Network Modal</button>
+        <h4>Address: {address}</h4>
+        <button
+            onClick={() => {
+                console.log('details', address, selectedNetworkId);
+             
+            }}
+        
+        >Get details</button>
+      </>
+    )
+  }
+
 export default function ExampleReactNpmModule({ backgroundColor, height }) {
 
-    const [amountA, setAmountA] = useState(0)
-    console.log('amount a', amountA);
+    console.log('goerli', goerli);
 
+    const projectId = 'ec34b7ce08621ea43343eaf71e71e86b';
+    // // createWeb3Modal()
+    const metadata = {
+      name: 'Web3Modal',
+      description: 'Web3Modal Example',
+      url: 'https://web3modal.com',
+      icons: ['https://avatars.githubusercontent.com/u/37784886']
+    }
+  
+    const chains = [mainnet, goerli]
+  
+    const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
+    createWeb3Modal({ wagmiConfig, projectId, chains })
+    // const { open, selectedNetworkId } = useWeb3ModalState()
+
+    
     const style = {
         background: backgroundColor,
         margin: 'auto',
@@ -15,16 +65,16 @@ export default function ExampleReactNpmModule({ backgroundColor, height }) {
         marginTop: '2rem',
     }
 
-
-
     return (
+        <WagmiConfig config={wagmiConfig} >
+
         <div style={style} >
             <h1 style={{
                 alignSelf: 'flex-start',
                 marginBottom: 'var(--dl-space-space-halfunit)',
                 textAlign: 'center'
 
-            }} >Transfer funds :)</h1>
+            }} >Transfer funds connect button :)</h1>
             <br />
             <div style={{
                 float: 'left',
@@ -63,8 +113,12 @@ export default function ExampleReactNpmModule({ backgroundColor, height }) {
 
                 >Send</button>
             </div>
-
-
+            <ConnectButton />
+        {/* <button onClick={() => {console.log('state of wallet', open, selectedNetworkId)}} >Get wallet details</button>
+        <h4>network id: {selectedNetworkId}</h4> */}
+      
         </div>
+        </WagmiConfig>
+        
     )
 }
